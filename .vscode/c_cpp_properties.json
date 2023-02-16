@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "main",
+            "includePath": [
+                "${workspaceFolder}/game/include/",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/raylib-master/src/"
+            ],
+        }
+    ],
+    "version": 4
+}

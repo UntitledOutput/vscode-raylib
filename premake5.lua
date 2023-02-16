@@ -52,6 +52,21 @@ function check_raylib()
     end
 end
 
+function check_w64()
+    if(os.isdir("w64devkit") == false and os.isdir("w64devkit-master") == false) then
+        if(not os.isfile("w64devkit.zip")) then
+            print("w64Devkit not found, downloading from github")
+            local result_str, response_code = http.download("https://github.com/skeeto/w64devkit/releases/download/v1.18.0/w64devkit-1.18.0.zip", "w64devkit.zip", {
+                progress = download_progress,
+                headers = { "From: Premake", "Referer: Premake" }
+            })
+        end
+        print("Unzipping to " ..  os.getcwd())
+        zip.extract("w64devkit.zip", os.getcwd())
+        os.remove("w64devkit.zip")
+    end
+end
+
 workspaceName = path.getbasename(os.getcwd())
 
 if (string.lower(workspaceName) == "raylib") then
@@ -60,9 +75,16 @@ if (string.lower(workspaceName) == "raylib") then
     os.exit()
 end
 
+if (string.lower(workspaceName) == "w64devkit") then
+    print("w64devkit is a reserved name. Name your project directory something else.")
+    -- Project generation will succeed, but compilation will definitely fail, so just abort here.
+    os.exit()
+end
+
 workspace (workspaceName)
     configurations { "Debug", "Release"}
     platforms { "x64", "x86"}
+    language "C++"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
@@ -78,6 +100,8 @@ workspace (workspaceName)
     filter {}
 
     targetdir "_bin/%{cfg.buildcfg}/"
+    includedirs "game/include"
+    libdirs "game/lib"
 
     if(os.isdir("game")) then
         startproject(workspaceName)
@@ -86,6 +110,7 @@ workspace (workspaceName)
     cdialect "C99"
     cppdialect "C++11"
 check_raylib();
+check_w64();
 
 include ("raylib_premake5.lua")
 
